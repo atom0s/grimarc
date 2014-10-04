@@ -28,7 +28,7 @@
 #include "ARCFile.h"
 #include "lz4\lz4.h"
 
-#define GRIMARC_VERSION_STRING "1.0.0 [B21]"
+#define GRIMARC_VERSION_STRING "1.0.1 [B21]"
 
 /**
  * @brief Application entry point.
@@ -106,7 +106,7 @@ int __cdecl main(int argc, char* argv[])
                 strcpy_s(szOutputFile, szWorkingDirectory);
                 strcat_s(szOutputFile, "\\extracted\\");
                 strcat_s(szOutputFile, (const char*)&buffer[header->RecordTableOffset + header->RecordTableSize + tocEntry->StringEntryOffset]);
-                
+
                 // Obtain the proper formatted path..
                 char szOutputPath[MAX_PATH] = { 0 };
                 ::GetFullPathName(szOutputFile, MAX_PATH, szOutputFile, NULL);
@@ -133,11 +133,11 @@ int __cdecl main(int argc, char* argv[])
                     for (auto y = 0; y < tocEntry->FileParts; y++)
                     {
                         // Obtain the part entry for this toc file..
-                        auto part = (ARC_V3_FILE_PART*)&buffer[header->RecordTableOffset + (tocEntry->FirstPartIndex * sizeof(ARC_V3_FILE_PART))];
+                        auto part = (ARC_V3_FILE_PART*)&buffer[header->RecordTableOffset + ((tocEntry->FirstPartIndex + y) * sizeof(ARC_V3_FILE_PART))];
 
                         // If the part is not compressed, dump the part data directly..
                         if (part->CompressedSize == part->DecompressedSize)
-                            fwrite(buffer + part->PartOffset, 1, part->DecompressedSize, f);
+                            fwrite(buffer + part->PartOffset, part->DecompressedSize, 1, f);
                         else
                         {
                             // The part is decompressed, we need to decompress it..
@@ -150,7 +150,7 @@ int __cdecl main(int argc, char* argv[])
                             if (ret < 0)
                                 printf_s("[ERROR] --> Failed to decompress a file part!\n");
                             else
-                                fwrite(decompressed, 1, part->DecompressedSize, f);
+                                fwrite(decompressed, part->DecompressedSize, 1, f);
 
                             delete[] compressed;
                             delete[] decompressed;
