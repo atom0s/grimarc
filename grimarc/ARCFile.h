@@ -57,7 +57,7 @@ struct ARC_V3_FILE_TOC_ENTRY
     unsigned int        FileOffset;
     unsigned int        CompressedSize;
     unsigned int        DecompressedSize;
-    unsigned int        Unknown0001; // Possible timestamp?
+    unsigned int        DecompressedHash; // Adler32 hash of the decompressed file bytes
     unsigned __int64    FileTime;
     unsigned int        FileParts;
     unsigned int        FirstPartIndex;
